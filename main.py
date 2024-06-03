@@ -5,7 +5,10 @@ from datetime import datetime
 import time
 import os
 
-SLACK_WEBHOOK_URL = os.getenv('SLACK_TOKEN')
+from dotenv import load_dotenv
+
+load_dotenv()
+SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
 CSV_FILE_INFOCOM = 'database/notified_posts_infocom.csv'
 CSV_FILE_SCATCH = 'database/notified_posts_scatch.csv'
 CSV_FILE_DISU = 'database/notified_posts_disu.csv'
@@ -14,8 +17,8 @@ TIME_INTERVAL = 5
 
 def check_new_posts_infocom():
     base_urls = [
-        {'name':'학사', 'link':'http://infocom.ssu.ac.kr/kor/notice/undergraduate.php'},
-        {'name':'대학원', 'link':'http://infocom.ssu.ac.kr/kor/notice/graduateSchool.php'}
+        {'name': '학사', 'link': 'http://infocom.ssu.ac.kr/kor/notice/undergraduate.php'},
+        {'name': '대학원', 'link': 'http://infocom.ssu.ac.kr/kor/notice/graduateSchool.php'}
     ]
     for url in base_urls:
         response = requests.get(url['link'])
@@ -28,10 +31,12 @@ def check_new_posts_infocom():
             title_span = post.find('span')
             title = f"[{url['name']}] {title_span.text.strip('[대학원] ')}" if title_span else None
             link = post.find_parent('a')['href'] if post.find_parent('a') else ""
-            full_link = f'http://infocom.ssu.ac.kr{link}' if link.startswith('/') else link if link != "" else url['link']
+            full_link = f'http://infocom.ssu.ac.kr{link}' if link.startswith(
+                '/') else link if link != "" else url['link']
             new_posts.append({'title': title, 'link': full_link})
 
     return new_posts
+
 
 def check_new_posts_scatch():
     url = 'https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/'
